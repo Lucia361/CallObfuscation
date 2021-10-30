@@ -87,7 +87,7 @@ namespace CallObfuscation {
                     if (methodDescriptor.DeclaringType is TypeSpecification) continue;
                     if (methodDescriptor.Signature!.IsSentinel) continue;
                     if (methodDescriptor.DeclaringType?.Resolve() is not { IsDelegate: false } resolvedType) continue;
-                    if (resolvedType.IsValueType && method.Signature!.HasThis) continue;
+                    if (resolvedType.IsValueType && methodDescriptor.Signature!.HasThis) continue;
 
                     if (!identifierCache.ContainsKey(methodDescriptor)) {
                         identifierCache[methodDescriptor] = currentIndex++;

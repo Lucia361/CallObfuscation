@@ -121,8 +121,6 @@ namespace CallObfuscation {
                     instructions.InsertRange(i, calliExpression);
                     i += calliExpression.Length;
                 }
-
-                method.CilMethodBody.ComputeMaxStackOnBuild = false;
                 instructions.OptimizeMacros();
             }
 

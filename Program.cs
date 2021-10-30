@@ -73,7 +73,8 @@ namespace CallObfuscation {
                 for (int i = 0; i < instructions.Count; i++) {
                     var instruction = instructions[i];
 
-                    if (!(instruction.OpCode == CilOpCodes.Call || instruction.OpCode == CilOpCodes.Callvirt)) continue;
+                    if (!(instruction.OpCode == CilOpCodes.Call ||
+                          instruction.OpCode == CilOpCodes.Callvirt)) continue;
                     if (instruction.Operand is not IMethodDescriptor methodDescriptor) continue;
 
                     switch (methodDescriptor) {
@@ -121,6 +122,7 @@ namespace CallObfuscation {
                     i += calliExpression.Length;
                 }
 
+                method.CilMethodBody.ComputeMaxStackOnBuild = false;
                 instructions.OptimizeMacros();
             }
 
@@ -169,7 +171,8 @@ namespace CallObfuscation {
             return null;
 
             bool StringEquals(IReadOnlyCollection<string> a, IReadOnlyList<string> b) {
-                return a.Count != b.Count && !a.Where((t, x) => t != b[x]).Any();
+                if (a.Count != b.Count) return false;
+                return !a.Where((t, x) => t != b[x]).Any();
             }
         }
 
@@ -190,7 +193,7 @@ namespace CallObfuscation {
 
             IEnumerable<CilInstruction> Mutate(int i32Value) {
                 var instructions = new List<CilInstruction>();
-                switch (random.Next(4)) {
+                switch (random.Next(3)) {
                     case 0:
                         int subI32 = random.Next();
                         instructions.AddRange(new[] {
@@ -213,14 +216,6 @@ namespace CallObfuscation {
                             new CilInstruction(CilOpCodes.Ldc_I4, i32Value ^ xorI32),
                             new CilInstruction(CilOpCodes.Ldc_I4, xorI32),
                             new CilInstruction(CilOpCodes.Xor)
-                        });
-                        break;
-                    case 3:
-                        instructions.AddRange(new[] {
-                            new CilInstruction(CilOpCodes.Ldc_I4, i32Value),
-                            // shh bypass this code.
-                            new CilInstruction(CilOpCodes.Not),
-                            new CilInstruction(CilOpCodes.Not)
                         });
                         break;
                 }
